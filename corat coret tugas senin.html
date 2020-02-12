@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<HTML>
+<head><title>Monty Hall Problem | JavaScript | Computing</title>
+<style type="text/css">
+  #header{
+    background-color: #EEEEEE;
+  }
+
+  #body{
+    background-color: #F0F0E1;
+    font-family: Cambria;
+  }
+</style>
+<header>
+  <H5>Muhammad Salman Burhanuddin<br>
+      Sheva Adam
+  </H5>
+<h1 id="header">The Monty Hall Problem</h1>
+</header>
+<body id="body">
+<article>
+<form name="game_show" style="text-align:center">
+<br>
+
+<script>
+<!--
+document.write("<a href=\"javascript:select_door(1)\"><img src=\"door.png\" name=\"door1\" border=0 width=\"10%\"</a>");
+document.write("<a href=\"javascript:select_door(2)\"><img src=\"door.jpeg\" name=\"door2\" border=0 width=\"10%\"></a>");
+document.write("<a href=\"javascript:select_door(3)\"><img src=\"door.jpeg\" name=\"door3\" border=0 width=\"10%\"></a><br>");
+document.write("<br>");
+document.write("<input name=\"play_button\" type=\"button\" value=\"Play\" onClick=\"reveal()\"> ");
+document.write(" <input name=\"reset_button\" type=\"button\" value=\"Reset\" onClick=\"initialise()\">");
+document.write()
+//-->
+</script>
+<br>
+<br>
+<br>
+<div id=status style="display: inline; font-size: 18px; color:#663366; font-weight: bold"></div><br>
+<br>
+Probability of winning after changing selection: <div id="p_win_change" style="display: inline"></div><br>
+<br>
+Probability of winning with original selection: <div id="p_win_stick" style="display: inline"></div><br>
+<br>
+Sample size: <div id="sample_size" style="display: inline"></div><br>
+</form>
+
+<h2>Instructions</h2>
+<ul>
+<li><p>First, select a door by clicking on it.  A question mark will appear to indicate that that is the door you have chosen.  You may change your mind as many times as you like at this point.</p>
+<li><p>Click the "Play" button.  The host will open one of the doors behind which there is no prize; this is indicated by the red cross.</p>
+<li><p>You can now change your mind.  Select one of the remaining doors.</p>
+<li><p>Click the "Play" button again.  A green tick will appear in place of the door that conceals the prize.  The status field will describe the outcome and the probabilities will be updated.</p>
+<li><p>To play again and calculate the probabilities over a larger sample size, click "Reset".</p>
+</ul>
+
+<script>
+<!--
+
+  var i, door_selected, winning_door, open_door, played, win_change, win_stick, changed, count;
+  win_change = 0;
+  win_stick = 0;
+  count = 0;
+  
+  door=new Array(4);
+
+  door[0] = new Image();
+  door[0].src="images/cross.png";
+  door[1] = new Image();
+  door[1].src="images/door.png";
+  door[2] = new Image();
+  door[2].src="images/door_selected.png";
+  door[3] = new Image();
+  door[3].src="images/tick.png";
+
+  initialise();
+
+  function initialise()
+  {
+    winning_door=Math.round((Math.random() * 2)) + 1;
+    door_selected = 0;
+    open_door = 0;
+    played = 0;
+    changed = 0;
+    document.getElementById("status").innerHTML = "Select a door and click <em>Play</em>";
+    document.getElementById("sample_size").innerHTML = count;
+
+    for(i = 1; i < 4; i++)
+    {
+      change_picture(i, 1);
+    }
+  }
+
+  function select_door(n)
+  {
+    if(n != door_selected & !(played))
+    {
+      change_picture(door_selected, 1);
+      change_picture(n, 2);
+      door_selected = n;
+    }
+
+    if(n != door_selected & n != open_door & played)
+    {
+      if(changed)
+      {
+        changed = 0;
+        document.getElementById("status").innerHTML = "You're sticking with your original choice.  Click \"Play\" to continue.";
+      }
+      else
+      {
+        changed = 1;
+        document.getElementById("status").innerHTML = "You have changed your mind!  Click <em>Play</em> to continue.";
+      }
+
+      change_picture(door_selected, 1);
+      change_picture(n, 2);
+      door_selected = n;
+    }
+  }
+
+  function reveal()
+  {
+
+    if(played)
+    {   
+      if(played == 1)
+      {
+        change_picture(winning_door, 3);
+        if(winning_door == door_selected)
+        {
+  
+          document.getElementById("status").innerHTML = "You've won!  Click <em>Play</em> or <em>Reset</em> to play again.";
+
+          if(changed)
+          {
+            win_change++;
+          }
+          else
+          {
+            win_stick++;
+          }
+        }
+        else
+        {
+  
+          document.getElementById("status").innerHTML = "You've lost!  Click <em>Play</em> or <em>Reset</em> to play again.";
+
+          if(changed)
+          {
+            win_stick++;
+          }
+          else
+          {
+            win_change++;
+          }
+          
+        }
+  
+        played++;
+        count++;
+
+        document.getElementById("p_win_change").innerHTML = (Math.round(win_change * 100 / count)) / 100;
+        document.getElementById("p_win_stick").innerHTML = (Math.round(win_stick * 100 / count)) / 100;
+        document.getElementById("sample_size").innerHTML = count;
+
+      }
+      else
+      {
+        initialise();
+      }
+    }
+    else
+    {
+      if(door_selected == 0) {alert("You must select a door before clicking the Play button!");}
+      else
+      {
+        for(i = Math.round((Math.random() * 2)) + 1; (i == door_selected) | (i == winning_door); i = Math.round((Math.random() * 2)) + 1);
+        open_door = i;
+        change_picture(i, 0);
+        played = 1;
+        document.getElementById("status").innerHTML = "Do you want to change your mind?  Select a door and click <em>Play</em>.";
+      }
+    }
+  }
+
+  function change_picture(pic, img)
+  {
+    if(pic == 1) {window.document.game_show.door1.src = door[img].src;}
+    if(pic == 2) {window.document.game_show.door2.src = door[img].src;}
+    if(pic == 3) {window.document.game_show.door3.src = door[img].src;}
+  }
+
+//-->
+</script>
+
+</article>
+</body>
+</HTML>
